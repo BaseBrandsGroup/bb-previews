@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
 <meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The 10K Gap Calculator | Frequency</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -269,6 +269,7 @@ const RETENTION_CUTOFF = 6;     // months
 const CLOSE_CUTOFF = 0.25;      // 25%
 const CALL_BAND = 6000;         // £6k+/month goes straight to a call
 const CALL_LINK = '#book-a-call'; // GHL calendar link
+const WEBHOOK_URL = ''; // GHL Inbound Webhook URL. Leave empty for previews (nothing is sent).
 
 const answers = {}; QUESTIONS.forEach(q => answers[q.id] = q.def);
 let step = 0;
@@ -384,7 +385,7 @@ function render(){
   $('rBadge').textContent = 'Your #1 bottleneck: ' + c.badge;
   $('rTitle').textContent = c.title;
   $('rWhy').innerHTML = c.why(r);
-  $('rVideo').textContent = c.video;
+  $('rVideo').textContent = "You've got your number. Here's what to do next"; /* one generic video for every result */
   $('rFixes').innerHTML = c.fixes.map((f,i)=>`<li><span class="num">0${i+1}</span><div><b>${f[0]}</b><span>${f[1]}</span></div></li>`).join('');
 
   /* Upsell: every result ends on booking a call. £6k+ coaches get the priority wording. */
@@ -415,7 +416,13 @@ $('optForm').addEventListener('submit', e => {
   if (!$('consent').checked) return $('formErr').textContent = 'Tick the box so we can send your results.';
   $('formErr').textContent = '';
   const payload = buildPayload();
-  // GHL HOOK: submit `payload` to the Growth Engine form/webhook here, and fire the Meta "Lead" event.
+  // Send to the GHL Inbound Webhook (form-encoded so it works cross-origin without a CORS preflight).
+  if (WEBHOOK_URL) {
+    const body = new URLSearchParams();
+    Object.entries(payload).forEach(([k, v]) => body.append(k, Array.isArray(v) ? v.join(',') : v));
+    fetch(WEBHOOK_URL, {method:'POST', mode:'no-cors', body}).catch(() => {});
+  }
+  // TODO: fire the Meta "Lead" event here once the pixel is on the Growth Engine page.
   console.log('10K Gap payload', payload);
   render();
   $('landing').style.display = 'none';

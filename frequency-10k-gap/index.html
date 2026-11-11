@@ -60,13 +60,23 @@
 
   /* hero */
   .hero{padding:64px 0 72px;background:radial-gradient(ellipse at 30% 0%,rgba(201,162,75,.16),transparent 60%),var(--bg)}
-  .hero .wrap{display:grid;grid-template-columns:1.25fr 1fr;gap:48px;align-items:center}
+  .hero .wrap{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:center}
   .hero h1{font-weight:800;font-size:clamp(28px,5vw,42px);line-height:1.05;letter-spacing:-.9px;text-transform:uppercase;margin-top:20px}
   .hero h1 .big{display:block;font-weight:900;font-size:clamp(60px,11vw,112px);letter-spacing:-2px;line-height:.95}
   .hero .lead{max-width:500px;margin:20px 0 28px;font-size:18px}
-  .hero .photo{aspect-ratio:4/5}
-  .hero .cap{position:absolute;left:14px;right:14px;bottom:14px;background:rgba(10,10,11,.78);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:13px}
-  .hero .cap b{display:block;font-family:var(--head);color:var(--ink);font-size:14px}
+  .byline{display:flex;align-items:center;gap:12px;margin-top:26px;font-size:13.5px;color:var(--muted)}
+  .byline img{width:44px;height:44px;border-radius:50%;object-fit:cover;object-position:50% 8%;border:1px solid var(--gold-line);flex:0 0 auto}
+  .byline b{color:var(--ink);font-weight:600}
+  .byline span{text-align:left;line-height:1.45}
+  .hero .rcard{box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 0 1px var(--gold-line)}
+
+  /* question section */
+  .qrow{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;max-width:960px;margin:0 auto}
+  .qrow h2{font-weight:800;font-size:clamp(28px,4.5vw,38px);letter-spacing:-.8px;line-height:1.1;margin:14px 0 12px}
+  .qsteps{list-style:none;display:grid;gap:14px;margin:22px 0 28px}
+  .qsteps li{display:flex;gap:14px;align-items:baseline}
+  .qsteps b{font-family:var(--head);color:var(--ink);display:block;font-size:16px}
+  .qsteps span{font-size:15px}
 
   /* sections */
   section.block{padding:72px 0;border-top:1px solid var(--line)}
@@ -137,11 +147,15 @@
   footer .logo{font-size:18px;margin-bottom:8px}
 
   @media (max-width:860px){
-    .hero .wrap,.preview,.about{grid-template-columns:1fr}
+    .hero .wrap,.preview,.about,.qrow{grid-template-columns:1fr}
     .hero{padding:44px 0 52px;text-align:center}
+    .hero .wrap{gap:36px}
     .hero .eyebrow::before{display:block}
     .hero .lead{margin:18px auto 24px}
-    .hero .photo{width:100%;max-width:340px;margin:8px auto 0;aspect-ratio:1/1}
+    .hero .rcard{text-align:left}
+    .hero .rcard .eyebrow::before{display:none}
+    .byline{justify-content:center}
+    .qrow{gap:28px}
     .about{gap:28px}
     .about .photo{max-width:340px;aspect-ratio:1/1}
     .wins{grid-template-columns:1fr}
@@ -171,24 +185,51 @@
       <p class="lead">8 quick questions about your coaching business. See how far you are from £10k a month, and the one thing holding you back.</p>
       <a href="10k-gap-calculator.html" class="btn">Start the calculator</a>
       <div class="fine"><b>Free</b> · 90 seconds · No sign-up to start</div>
+      <div class="byline"><img src="clint-hero.jpg" alt="Clint Lewis"><span>Built by <b>Clint Lewis</b><br>1,000+ clients coached since 2019</span></div>
     </div>
-    <div class="photo" id="heroPhoto">
-      <img src="clint-hero.jpg" alt="Clint Lewis, founder of Frequency" onerror="this.parentNode.classList.add('missing')">
-      <div class="ph">Photo of Clint<br>(hero, portrait)</div>
-      <div class="cap"><b>Clint Lewis</b>1,000+ clients coached since 2019</div>
+
+    <div class="card rcard" aria-label="Example result with details hidden">
+      <span class="pv-label">Example result</span>
+      <div class="eyebrow left" style="font-size:10.5px">Your 10K Gap</div>
+      <div class="gap gold-text">£6,400</div>
+      <div class="gsub">a month to go. On £3,600 now (18 clients × £200)</div>
+      <div class="minis" aria-hidden="true">
+        <div class="mini"><div class="k">Where you'll level off</div><div class="v blur">16 clients</div></div>
+        <div class="mini"><div class="k">Close rate</div><div class="v blur">40%</div></div>
+        <div class="mini"><div class="k">Lost to clients leaving</div><div class="v blur">£10,800</div></div>
+      </div>
+      <div class="bneck" aria-hidden="true">
+        <span class="badge">#1 bottleneck: <span class="blur" style="display:inline-block">Retention</span></span>
+        <h4 class="blur">Clients are leaving before you can grow</h4>
+      </div>
+      <ul class="fx" aria-hidden="true">
+        <li><span class="num">01</span><span class="blur">A weekly check-in routine</span></li>
+        <li><span class="num">02</span><span class="blur">A 90-day goal for every client</span></li>
+        <li><span class="num">03</span><span class="blur">A renewal chat in month 2</span></li>
+      </ul>
+      <div class="unlock">
+        <div class="lockpill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Unlocks with your numbers</div><br>
+        <a href="10k-gap-calculator.html" class="btn">Get my results</a>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="block">
   <div class="wrap">
-    <div class="sec-head">
-      <div class="eyebrow">What you'll get</div>
-      <h2>Real numbers. <span class="gold-text">A real answer.</span></h2>
-      <p>Not a quiz. You put in your actual numbers and get a breakdown of your business, built on the same maths Clint uses with his own clients.</p>
-    </div>
+    <div class="qrow">
+      <div>
+        <div class="eyebrow left">How it works</div>
+        <h2>Real numbers. <span class="gold-text">A real answer.</span></h2>
+        <p>Not a quiz. You put in your actual numbers and get a breakdown of your business, built on the same maths Clint uses with his own clients.</p>
+        <ul class="qsteps">
+          <li><span class="num">01</span><div><b>Answer 8 questions</b><span>Your clients, price, calls, hours and target.</span></div></li>
+          <li><span class="num">02</span><div><b>See your gap</b><span>Where you'll level off and your #1 bottleneck.</span></div></li>
+          <li><span class="num">03</span><div><b>Get your plan</b><span>3 fixes you can start this week.</span></div></li>
+        </ul>
+        <a href="10k-gap-calculator.html" class="btn">Start the calculator</a>
+      </div>
 
-    <div class="preview">
       <a class="card qcard" href="10k-gap-calculator.html" aria-label="Start the calculator">
         <span class="pv-label">A question from the calculator</span>
         <div class="progress"><i></i></div>
@@ -197,44 +238,8 @@
         <div class="qval"><span>£</span>150</div>
         <div class="track"></div>
         <div class="ends"><span>£0</span><span>£2,000</span></div>
-        <ul class="qlist">
-          <li>Your clients, price and how long they stay</li>
-          <li>Your calls, sign-ups and hours</li>
-          <li>Your capacity and your target</li>
-        </ul>
         <div class="qnext">Answer the rest →</div>
       </a>
-
-      <div class="card rcard" aria-label="Example result with details hidden">
-        <span class="pv-label">Example result</span>
-        <div class="eyebrow left" style="font-size:10.5px">Your 10K Gap</div>
-        <div class="gap gold-text">£6,400</div>
-        <div class="gsub">a month to go. On £3,600 now (18 clients × £200)</div>
-        <div class="minis" aria-hidden="true">
-          <div class="mini"><div class="k">Where you'll level off</div><div class="v blur">16 clients</div></div>
-          <div class="mini"><div class="k">Close rate</div><div class="v blur">40%</div></div>
-          <div class="mini"><div class="k">Lost to clients leaving</div><div class="v blur">£10,800</div></div>
-        </div>
-        <div class="bneck" aria-hidden="true">
-          <span class="badge">#1 bottleneck: <span class="blur" style="display:inline-block">Retention</span></span>
-          <h4 class="blur">Clients are leaving before you can grow</h4>
-        </div>
-        <ul class="fx" aria-hidden="true">
-          <li><span class="num">01</span><span class="blur">A weekly check-in routine</span></li>
-          <li><span class="num">02</span><span class="blur">A 90-day goal for every client</span></li>
-          <li><span class="num">03</span><span class="blur">A renewal chat in month 2</span></li>
-        </ul>
-        <div class="unlock">
-          <div class="lockpill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Unlocks with your numbers</div><br>
-          <a href="10k-gap-calculator.html" class="btn">Get my results</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="steps-line">
-      <span><b>01</b>Answer 8 questions</span>
-      <span><b>02</b>See your gap and your bottleneck</span>
-      <span><b>03</b>Get 3 fixes to start this week</span>
     </div>
   </div>
 </section>

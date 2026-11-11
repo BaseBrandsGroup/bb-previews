@@ -34,9 +34,16 @@ done
 git add "$slug"
 if git diff --cached --quiet; then echo "No changes to publish."; else
   git commit -m "Preview: $slug"
-  git push
+  # Use the GitHub token saved in Claude's settings if there is one (gh isn't needed)
+  if [[ -n "${GITHUB_PERSONAL_ACCESS_TOKEN:-}" ]]; then
+    auth=$(printf 'x-access-token:%s' "$GITHUB_PERSONAL_ACCESS_TOKEN" | base64 | tr -d '\n')
+    git -c http.extraheader="Authorization: Basic $auth" push
+  else
+    git push
+  fi
 fi
 
-user=$(gh api user -q .login)
+# Work out the GitHub account from the repo address, e.g. github.com/BaseBrandsGroup/bb-previews
+owner=$(git remote get-url origin | sed -E 's#.*github\.com[:/]([^/]+)/.*#\1#' | tr '[:upper:]' '[:lower:]')
 echo ""
-echo "Live in 1-2 minutes at: https://$user.github.io/bb-previews/$slug/"
+echo "Live in 1-2 minutes at: https://$owner.github.io/bb-previews/$slug/"

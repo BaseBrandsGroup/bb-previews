@@ -9,7 +9,9 @@ This repo hosts temporary previews of client pages (landing pages, calculators, 
 - The site is public to anyone with the link. Never commit client data, passwords, API keys, webhook URLs or anything that submits real form data.
 - Remove a client's folder once their page is live in GHL.
 
-## First-time setup (run once)
+## First-time setup (done 2026-11-11)
+Already set up: repo `BaseBrandsGroup/bb-previews`, Pages live at https://basebrandsgroup.github.io/bb-previews/. `gh` is not installed on this Mac; GitHub access uses the `GITHUB_PERSONAL_ACCESS_TOKEN` from Claude's settings (the steps below were done through the GitHub API with that token instead).
+
 1. `gh auth status` must show a logged-in account. If not, ask the user to run `gh auth login`.
 2. From this folder: `git init -b main && git add . && git commit -m "Set up previews site"`
 3. `gh repo create bb-previews --public --source=. --remote=origin --push`
@@ -19,4 +21,4 @@ This repo hosts temporary previews of client pages (landing pages, calculators, 
 ## Adding or updating a preview
 `scripts/add-preview.sh <slug> <file-or-folder> [more files...]`
 
-It copies the files into the slug folder, adds `index.html` if missing, adds the noindex tag, commits, pushes and prints the link. Pages takes 1-2 minutes to update after a push.
+It needs no `gh`: it pushes with `GITHUB_PERSONAL_ACCESS_TOKEN` if set, otherwise plain `git push`. It copies the files into the slug folder, adds `index.html` if missing, adds the noindex tag, commits, pushes and prints the link. Pages takes 1-2 minutes to update after a push.

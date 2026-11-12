@@ -138,7 +138,15 @@ const fromHex = h => new Uint8Array(h.match(/../g).map(x => parseInt(x, 16)));
 (async () => {
   let saved = null;
   try { saved = localStorage.getItem(STORE); } catch (e) {}
-  if (saved) { try { await open(fromHex(saved)); return; } catch (e) { try { localStorage.removeItem(STORE); } catch (e2) {} } }
+  if (saved) {
+    // Wait until this page has fully loaded. Replacing the document while it is still loading
+    // makes the browser append the hub under the password box instead of replacing it.
+    document.documentElement.style.visibility = 'hidden';
+    if (document.readyState !== 'complete') await new Promise(r => window.addEventListener('load', r, { once: true }));
+    await new Promise(r => setTimeout(r, 0));
+    try { await open(fromHex(saved)); return; }
+    catch (e) { try { localStorage.removeItem(STORE); } catch (e2) {} document.documentElement.style.visibility = ''; }
+  }
 })();
 
 document.getElementById('f').addEventListener('submit', async e => {

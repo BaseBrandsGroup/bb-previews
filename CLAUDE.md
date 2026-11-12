@@ -22,3 +22,14 @@ Already set up: repo `BaseBrandsGroup/bb-previews`, Pages live at https://basebr
 `scripts/add-preview.sh <slug> <file-or-folder> [more files...]`
 
 It needs no `gh`: it pushes with `GITHUB_PERSONAL_ACCESS_TOKEN` if set, otherwise plain `git push`. It copies the files into the slug folder, adds `index.html` if missing, adds the noindex tag, commits, pushes and prints the link. Pages takes 1-2 minutes to update after a push.
+
+## Password-locked previews
+For anything that shouldn't be open to anyone with the link (scripts, unreleased graphics, client photos), lock the page:
+
+`node tools/lock-preview.mjs <slug> <unlocked-page.html> "Client name" "subtitle"`
+
+- It encrypts the whole page (AES-256-GCM, key from the password via PBKDF2) and writes `<slug>/index.html`. Embed images in the page as data URIs, so they're locked too; separate image files in the folder would be public.
+- Passwords and salts live in `../bb-previews-private/previews.json`, outside the repo. Never commit them or print a password unless Fee asks.
+- Re-running the command for the same slug keeps the same password.
+- `assets/` holds the Base Brands logo and fonts used by the password page and branded hubs.
+- First locked preview: `rb-reclaim-launch` (Recalibrated Bodies campaign hub, 2026-11-12).

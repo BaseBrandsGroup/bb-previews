@@ -98,8 +98,8 @@
   .qval{display:flex;align-items:baseline;justify-content:center;gap:4px;margin:22px 0 14px;font-family:var(--head);font-weight:800;color:var(--ink);font-size:46px;letter-spacing:-1px}
   .qval span{color:var(--gold);font-size:28px}
   .track{position:relative;height:6px;border-radius:6px;background:var(--line)}
-  .track::before{content:"";position:absolute;left:0;top:0;bottom:0;width:30%;border-radius:6px;background:linear-gradient(90deg,var(--gold),var(--gold-2))}
-  .track::after{content:"";position:absolute;left:30%;top:50%;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;background:linear-gradient(90deg,var(--gold),var(--gold-2));border:3px solid var(--card);box-shadow:0 0 0 1px var(--gold)}
+  .track::before{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--p,30%);border-radius:6px;background:linear-gradient(90deg,var(--gold),var(--gold-2))}
+  .track::after{content:"";position:absolute;left:var(--p,30%);top:50%;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;background:linear-gradient(90deg,var(--gold),var(--gold-2));border:3px solid var(--card);box-shadow:0 0 0 1px var(--gold)}
   .ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:8px}
   .qnext{margin-top:20px;text-align:center;font-family:var(--head);font-weight:700;font-size:14px;color:var(--gold)}
   .qlist{list-style:none;margin-top:16px;display:grid;gap:8px;font-size:14px}
@@ -166,6 +166,32 @@
     .minis .mini:last-child{grid-column:1/-1}
     .bigstats b{font-size:22px}
     .card{padding:22px 20px}
+  }
+
+  /* ---------- Motion (switched on by the script; off for reduced-motion users) ---------- */
+  .anim .rv{opacity:0;translate:0 26px;transition:opacity .8s ease,translate .8s cubic-bezier(.2,.7,.2,1),transform .15s,box-shadow .15s}
+  .anim .rv.from-right{translate:40px 0}
+  .anim .rv.in{opacity:1;translate:0 0}
+  .anim .rcard .mini,.anim .rcard .bneck,.anim .rcard .fx li{opacity:0;translate:0 12px;transition:opacity .6s ease,translate .6s cubic-bezier(.2,.7,.2,1)}
+  .anim .rcard.in .mini,.anim .rcard.in .bneck,.anim .rcard.in .fx li{opacity:1;translate:0 0}
+  .anim .rcard .unlock{opacity:0;transition:opacity .7s ease 1.9s}
+  .anim .rcard.in .unlock{opacity:1}
+  .rcard{transition:transform .25s ease-out,box-shadow .25s}
+  .rcard .unlock .btn{animation:glow 2.8s ease-in-out 3s infinite}
+  @keyframes glow{0%,100%{box-shadow:0 8px 30px rgba(201,162,75,.18)}50%{box-shadow:0 8px 44px rgba(227,196,120,.55)}}
+  .lockpill svg{transform-origin:50% 60%;animation:jiggle 4s ease-in-out 3.2s infinite}
+  @keyframes jiggle{0%,86%,100%{transform:rotate(0)}89%{transform:rotate(-14deg)}92%{transform:rotate(12deg)}95%{transform:rotate(-6deg)}}
+  .hero{position:relative;overflow:hidden}
+  .hero::before{content:"";position:absolute;left:-10%;right:-10%;top:-20%;height:120%;background:radial-gradient(ellipse at 30% 10%,rgba(201,162,75,.14),transparent 55%);animation:breathe 9s ease-in-out infinite;pointer-events:none}
+  .hero .wrap{position:relative}
+  @keyframes breathe{0%,100%{opacity:.5;transform:translateX(0)}50%{opacity:1;transform:translateX(4%)}}
+  .hero h1 .big{background-size:200% 100%;animation:sheen 7s ease-in-out 1s infinite}
+  @keyframes sheen{0%,100%{background-position:0% 0}50%{background-position:100% 0}}
+  .qcard .qval{font-variant-numeric:tabular-nums}
+  .card.win{transition:transform .2s,border-color .2s}
+  .card.win:hover{transform:translateY(-4px);border-color:var(--gold-line)}
+  @media (prefers-reduced-motion:reduce){
+    .hero::before,.hero h1 .big,.rcard .unlock .btn,.lockpill svg{animation:none}
   }
 </style>
 </head>
@@ -284,5 +310,115 @@
   <div class="logo"><span class="gold-text">Frequency</span></div>
   © Frequency Mentor · frequencymentor.co.uk
 </footer>
+<script>
+/* Light motion: fade/slide in on scroll, count-ups, a moving slider and a gentle tilt on the result card.
+   Everything shows normally if this script doesn't run or the visitor prefers reduced motion. */
+(function(){
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || !('IntersectionObserver' in window)) return;
+  document.documentElement.classList.add('anim');
+  var $$ = function(q){ return Array.prototype.slice.call(document.querySelectorAll(q)); };
+
+  // what slides in: [selector, stagger ms, extra class, start delay ms]
+  [['.hero .wrap > div:first-child > *',80],['.hero .rcard',0,'from-right',300],
+   ['.qrow > div:first-child > *',80],['.qrow .qcard',0,'from-right',150],
+   ['.about .photo',0],['.about > div:last-child > *',90],['.wins .win',130],
+   ['.disclaimer',0],['.final .wrap > *',100]].forEach(function(g){
+    $$(g[0]).forEach(function(el,i){
+      el.classList.add('rv'); if (g[2]) el.classList.add(g[2]);
+      el.style.transitionDelay = ((g[3]||0) + i*g[1]) + 'ms';
+    });
+  });
+  $$('.rcard .mini, .rcard .bneck, .rcard .fx li').forEach(function(el,i){ el.style.transitionDelay = (900 + i*140) + 'ms'; });
+
+  function ease(t){ return 1 - Math.pow(1 - t, 3); }
+  function countUp(node, to, fmt, dur, delay){
+    setTimeout(function(){
+      var t0 = null;
+      function step(ts){ if (!t0) t0 = ts; var k = Math.min((ts - t0)/dur, 1); node.textContent = fmt(Math.round(to*ease(k))); if (k < 1) requestAnimationFrame(step); }
+      requestAnimationFrame(step);
+    }, delay || 0);
+    setTimeout(function(){ node.textContent = fmt(to); }, (delay || 0) + dur + 400); // safety net: always land on the real number
+  }
+  var gbp = function(n){ return '£' + n.toLocaleString('en-GB'); };
+  var onIn = new Map();
+
+  // £6,400 counts up when the result card arrives
+  var heroCard = document.querySelector('.hero .rcard'), gap = heroCard && heroCard.querySelector('.gap');
+  if (gap) onIn.set(heroCard, function(){ gap.textContent = gbp(0); countUp(gap, 6400, gbp, 1400, 450); });
+
+  // Clint's stats count up
+  var statsBox = document.querySelector('.about > div:last-child'), stats = $$('.bigstats b');
+  if (statsBox && stats.length) onIn.set(statsBox, function(){
+    stats.forEach(function(b){
+      var m = b.textContent.match(/^(\D*)([\d,]+)(.*)$/); if (!m) return;
+      var to = +m[2].replace(/,/g, ''); b.textContent = m[1] + '0' + m[3];
+      countUp(b, to, function(n){ return m[1] + n.toLocaleString('en-GB') + m[3]; }, 1300, 500);
+    });
+  });
+
+  // the example question's slider glides in, then drifts between a few answers
+  var qcard = document.querySelector('.qcard'), track = qcard && qcard.querySelector('.track'), qval = qcard && qcard.querySelector('.qval');
+  var numNode = qval && qval.lastChild;
+  function slideTo(from, to, dur, done){
+    var t0 = null;
+    function step(ts){ if (!t0) t0 = ts; var k = Math.min((ts - t0)/dur, 1), v = from + (to - from)*ease(k);
+      track.style.setProperty('--p', (v/500*100) + '%'); numNode.textContent = Math.round(v/10)*10;
+      if (k < 1) requestAnimationFrame(step); else if (done) done(); }
+    requestAnimationFrame(step);
+  }
+  if (track && numNode && numNode.nodeType === 3) {
+    track.style.setProperty('--p', '0%'); numNode.textContent = '0';
+    setTimeout(function(){ if (numNode.textContent === '0') { track.style.setProperty('--p', '30%'); numNode.textContent = '150'; } }, 6000);
+    onIn.set(qcard, function(){
+      var vals = [150, 240, 180, 150], i = 0, cur = 0;
+      setTimeout(function(){
+        slideTo(0, 150, 1200, function(){
+          cur = 150;
+          setTimeout(function next(){
+            i = (i + 1) % vals.length; var to = vals[i];
+            slideTo(cur, to, 900, function(){ cur = to; setTimeout(next, 1800); });
+          }, 2200);
+        });
+      }, 500);
+    });
+  }
+
+  // reveal anything that is on screen (on scroll, resize and load, plus IntersectionObserver when it fires)
+  function reveal(el){
+    if (el.classList.contains('in')) return;
+    el.classList.add('in');
+    var fn = onIn.get(el); if (fn) { onIn.delete(el); fn(); }
+  }
+  var watched = $$('.rv'); onIn.forEach(function(fn, el){ if (watched.indexOf(el) < 0) watched.push(el); });
+  function check(){
+    var h = window.innerHeight || document.documentElement.clientHeight;
+    watched = watched.filter(function(el){
+      var r = el.getBoundingClientRect();
+      if (r.top < h * 0.92) { reveal(el); return false; }  // on screen, or already scrolled past
+      return true;
+    });
+    if (!watched.length) { window.removeEventListener('scroll', check); window.removeEventListener('resize', check); clearInterval(timer); }
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if (e.isIntersecting) { reveal(e.target); io.unobserve(e.target); } });
+  }, {threshold: .15, rootMargin: '0px 0px -40px 0px'});
+  watched.forEach(function(el){ io.observe(el); });
+  window.addEventListener('scroll', check, {passive: true});
+  window.addEventListener('resize', check);
+  window.addEventListener('load', check);
+  setTimeout(check, 60);
+  var timer = setInterval(check, 350);
+
+  // gentle 3D tilt on the result card (mouse only)
+  if (heroCard && matchMedia('(hover:hover) and (pointer:fine)').matches) {
+    heroCard.addEventListener('mousemove', function(e){
+      var r = heroCard.getBoundingClientRect(), x = (e.clientX - r.left)/r.width - .5, y = (e.clientY - r.top)/r.height - .5;
+      heroCard.style.transform = 'perspective(900px) rotateX(' + (-y*5).toFixed(2) + 'deg) rotateY(' + (x*6).toFixed(2) + 'deg)';
+    });
+    heroCard.addEventListener('mouseleave', function(){ heroCard.style.transform = ''; });
+  }
+})();
+</script>
 </body>
 </html>

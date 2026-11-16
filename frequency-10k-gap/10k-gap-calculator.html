@@ -146,6 +146,21 @@
     .video{aspect-ratio:16/10}
     .val input{font-size:44px;width:170px}
   }
+
+  /* results video */
+  .two{align-items:start}
+  .vid{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#000}
+  .vid video{display:block;width:100%;height:100%;object-fit:cover;background:#000}
+  .v-land{aspect-ratio:16/9}
+  .v-vert{display:none;aspect-ratio:9/16;width:min(100%,calc(78vh * 9 / 16));margin:0 auto}
+  .vplay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:0;padding:0;cursor:pointer;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.35))}
+  .vplay .play{box-shadow:0 10px 40px rgba(0,0,0,.45);transition:transform .2s}
+  .vplay:hover .play{transform:scale(1.08)}
+  .vid.playing .vplay{display:none}
+  .vcap{display:flex;flex-direction:column;gap:2px;margin-top:10px}
+  .vcap .mont{font-weight:700;font-size:15px;color:var(--ink)}
+  .vcap small{color:var(--muted);font-size:12.5px}
+  @media (max-width:760px){ .v-land{display:none} .v-vert{display:block} .vcap{text-align:center} }
 </style>
 </head>
 <body>
@@ -229,10 +244,21 @@
       </div>
 
       <div class="two">
-        <div class="video">
-          <div class="play"></div>
-          <div class="mont" id="rVideo"></div>
-          <small>Video from Clint · 60–90 seconds</small>
+        <div class="video-wrap">
+          <!-- VIDEO: landscape on desktop, vertical on phones. In GHL, swap these four paths for the media library URLs. -->
+          <div class="vid v-land">
+            <video preload="none" playsinline poster="clint-10k-gap-landscape-poster.jpg" aria-label="Video from Clint: what to do with your result">
+              <source src="clint-10k-gap-landscape.mp4" type="video/mp4">
+            </video>
+            <button type="button" class="vplay" aria-label="Play Clint's video"><span class="play"></span></button>
+          </div>
+          <div class="vid v-vert">
+            <video preload="none" playsinline poster="clint-10k-gap-vertical-poster.jpg" aria-label="Video from Clint: what to do with your result">
+              <source src="clint-10k-gap-vertical.mp4" type="video/mp4">
+            </video>
+            <button type="button" class="vplay" aria-label="Play Clint's video"><span class="play"></span></button>
+          </div>
+          <div class="vcap"><span class="mont" id="rVideo"></span><small>Video from Clint · 2 minutes</small></div>
         </div>
         <div>
           <div class="eyebrow" style="margin:6px 0 14px;font-size:10.5px">3 fixes to start this week</div>
@@ -431,6 +457,27 @@ $('optForm').addEventListener('submit', e => {
 });
 
 show();
+</script>
+<script>
+/* results video: gold play button starts it; only the visible version plays */
+(function(){
+  var vids = Array.prototype.slice.call(document.querySelectorAll('.vid'));
+  vids.forEach(function(box){
+    var v = box.querySelector('video'), b = box.querySelector('.vplay');
+    b.addEventListener('click', function(){ v.controls = true; var p = v.play(); if (p && p.catch) p.catch(function(){}); });
+    v.addEventListener('play', function(){
+      box.classList.add('playing');
+      vids.forEach(function(o){ var ov = o.querySelector('video'); if (ov !== v && !ov.paused) ov.pause(); });
+    });
+  });
+  // if the screen size flips (e.g. phone rotated) pause whichever version is now hidden
+  if (window.matchMedia) {
+    var mq = matchMedia('(max-width:760px)'), pauseHidden = function(){
+      vids.forEach(function(o){ if (o.offsetParent === null) o.querySelector('video').pause(); });
+    };
+    if (mq.addEventListener) mq.addEventListener('change', pauseHidden); else if (mq.addListener) mq.addListener(pauseHidden);
+  }
+})();
 </script>
 </body>
 </html>

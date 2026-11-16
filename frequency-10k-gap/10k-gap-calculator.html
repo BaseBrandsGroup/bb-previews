@@ -457,6 +457,19 @@ $('optForm').addEventListener('submit', e => {
 });
 
 show();
+
+/* PREVIEW ONLY: add #results to the address to jump straight to the results page with the example answers.
+   Nothing is sent anywhere. Safe to delete when the page goes into GHL. */
+function previewResults(){
+  if (location.hash !== '#results') return;
+  $('fname').value = 'Coach';
+  render();
+  $('landing').style.display = 'none';
+  $('results').style.display = 'block';
+  window.scrollTo({top:0, behavior:'instant'});
+}
+previewResults();
+window.addEventListener('hashchange', previewResults);
 </script>
 <script>
 /* results video: gold play button starts it; only the visible version plays */
